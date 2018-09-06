@@ -2,7 +2,7 @@ import { fill, random, map, toNumber, split, forEach, get, size } from 'lodash';
 
 export const emptyInitial = fill(Array(10), fill(Array(10)));
 
-const EMPTY_CELL = { type: null, id: null };
+const EMPTY_CELL = { type: null, id: null, oldId: null };
 
 function checkCross(array, id, type) {
     const [outer, inner] = map(split(id, ':'), toNumber);
@@ -39,7 +39,7 @@ export function removeCell(array, id, type) {
 
     array[outer][inner] = EMPTY_CELL;
     checkCross(array, id, type);
-    // checkCorners(array, id, type);
+    checkCorners(array, id, type);
 
     return array;
 }
@@ -47,10 +47,11 @@ export function removeCell(array, id, type) {
 export function fillArray(array) {
     const refilled = map(array, (row, outer)=>
         map(row, (cell, inner) => cell && cell.id
-        ? cell
+        ? ({ ...cell, oldId: null })
         : ({
             type: random(1, 4),
-            id  : `${outer}:${inner}`
+            id : `${outer}:${inner}`,
+            oldId: null
           })
         )
     );
@@ -74,7 +75,10 @@ export function dropDownArray(array) {
                     const [outerTop, _] = map(split(topCell.id, ':'), toNumber);
                     /* need to swap */
                     topCell.id = `${outer}:${inner}`;
+                    topCell.oldId = `${outerTop}:${inner}`;
+                    topCell.y = Math.abs((outerTop - outer) * 60);
                     array[outer][inner] = topCell;
+                    // const newCell = EMPTY_CELL;
                     array[outerTop][inner] = EMPTY_CELL;
                 }
             }

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { map } from 'lodash';
 
-import { removeCell, fillArray, dropDownArray } from './utils';
+import Cell from '../Cell/Cell';
+import { removeCell, fillArray, dropDownArray } from '../../utils';
 import './App.css';
 
 
@@ -21,12 +22,6 @@ class App extends Component {
     this.setState({ array: refilled, refilled: true });
   }
 
-  drop = () => {
-    const { array } = this.state;
-    const dropped = dropDownArray(array);
-    this.setState({ array: dropped }, () => setTimeout(this.refill, 500));
-  }
-
   onChange = cell => {
     if (!cell || !cell.id || !this.state.refilled) return;
 
@@ -34,25 +29,24 @@ class App extends Component {
 
     const { array } = this.state;
     const trimmed = removeCell(array, cell.id, cell.type);
+    const dropped = dropDownArray(trimmed);
 
-    this.setState({ array: trimmed }, () => setTimeout(this.drop, 500));
+    this.setState({ array: dropped }, () => setTimeout(this.refill, 1000));
   }
 
   render() {
     const { array, refilled } = this.state;
 
     return (
-      <div className="app">
+      <div className={`app ${!refilled ? 'blocked' : ''}`}>
         {map(array, (row, index) =>
-        <div key={index} className="row">
+        <div key={index}>
           {map(row, (cell, anotherIndex) =>
-            <div
+            <Cell
               key={anotherIndex}
-              onClick={() => this.onChange(cell)}
-              className={`cell a-${cell.type} ${!refilled ? 'blocked' : ''}`}
-            >
-              {cell.type}
-            </div>
+              onChange={this.onChange}
+              {...cell}
+            />
           )}
         </div>)}
       </div>

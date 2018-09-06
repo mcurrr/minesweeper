@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { fillArray, emptyInitial } from './utils';
 
-import App from './App';
+import App from './components/App/App';
 import './index.css';
 
 const filled = fillArray(emptyInitial);
