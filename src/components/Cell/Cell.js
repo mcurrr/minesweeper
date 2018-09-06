@@ -9,15 +9,25 @@ class Cell extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.state = {
-        y: 0
-    }
+    this.state = { new: false }
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.id && nextProps.y && nextProps.id !== this.props.id && nextProps.y !== this.props.y) {
-        this.setState({ y: toNumber(nextProps.y) })
-    }
+    this.setState({ new: nextProps.type && !this.props.type })
+  }
+
+  renderCell = styles => {
+    const { id, type } = this.props;
+
+    return (
+        <div
+            style={styles}
+            onClick={() => this.props.onChange({ id, type })}
+            className={`cell a-${type} ${id ? '' : 'invisible'}`}
+        >
+            {type}
+        </div>
+    )
   }
 
   render() {
@@ -26,32 +36,18 @@ class Cell extends PureComponent {
     if (!id) return null;
 
     const [top, left] = map(split(id, ':'), x => toNumber(x) * 50);
-    const [oldTop, oldLeft] = oldId ? map(split(oldId, ':'), x => toNumber(x) * 50) : [0, 0];
+    const [oldTop, _] = oldId ? map(split(oldId, ':'), x => toNumber(x) * 50) : [0, 0];
 
-    return oldId ? (
-        <Motion
-            defaultStyle={{ top: oldTop, left: oldLeft }}
-            style={{ top: spring(top), left: spring(left) }}
-        >
-            {({ top, left }) =>
-            <div
-                style={{ top, left }}
-                onClick={() => this.props.onChange({ id, type })}
-                className={`cell a-${type} ${id ? '' : 'invisible'}`}
+    const defaultTop = this.state.new ? -1000 : oldTop;
+
+    return this.state.new || oldId
+        ?   <Motion
+                defaultStyle={{ top: defaultTop }}
+                style={{ top: spring(top) }}
             >
-                {type}
-            </div>
-            }
-        </Motion>
-    ) : (
-        <div
-            style={{ top, left }}
-            onClick={() => this.props.onChange({ id, type })}
-            className={`cell a-${type}`}
-        >
-            {type}
-        </div>
-    )
+                {({ top }) => this.renderCell({ top, left })}
+            </Motion>
+        : this.renderCell({ top, left })
   }
 }
 
