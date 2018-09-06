@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { getFilledArray } from './utils';
+import { fillArray, emptyInitial } from './utils';
 
 import App from './App';
 import './index.css';
 
-const filled = getFilledArray();
+const filled = fillArray(emptyInitial);
 
 ReactDOM.render(<App array={filled} />, document.getElementById('root'));
